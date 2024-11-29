@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+
+bname=$(basename $0)
+boldblue="\033[01;34m"
+boldgreen="\033[01;32m"
+none="\033[0m"
+# Help message
+function helpMessage() {
+echo -e "$boldblue
+Torch v1.0 (2024-11-29 11:01:00 EST) by @KnightEndall $none
+
+$boldgreen
+Purpose: $none
+	Creates a new file with 755 permissions and optional header.
+$boldgreen
+Usage: $none
+	$bname [options]
+	$bname <filename> <extension>
+	$bname <filename> <extension> <permissions>
+	$bname <filename> <extension> [-n]
+	$bname <filename> <extension> <permissions> [-n]
+$boldgreen
+Options: $none
+	-h, --help  Show this help message
+$boldgreen
+Arguments: $none
+	filename: The desired name for the new file.
+	extension: File extension (e.g., sh, bash, c, c++, py, rs, txt).
+	permissions: The desired permissions if other than 755.
+	-n: Optional flag to create the file without adding a header.
+$boldgreen
+Examples: $none
+	Create a new shell script:
+		$bname myscript sh
+	
+	Create a new bash script:
+		$bname myscript bash
+
+	Create a new C file:
+		$bname myprogram c
+
+	Create a new C++ file:
+		$bname myprogram cpp 777
+
+	Create a headerless C file:
+		$bname myprogram c -n
+
+	Create a new Python file:
+		$bname myprogram py
+
+	Create a new Rust file:
+		$bname myprogram rs
+
+	Create an empty text file:
+		$bname mytextfile txt
+$boldgreen
+Additional Notes: $none
+	Adds executable permissions (755) to the created file.
+"
+}
+
+# Check for help flag
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+	helpMessage
+	exit 0;
+fi
+
+# Check to see if file exist
+if [[ $2 == "bash" ]]; then
+	file=$1.sh;
+	if [ ! -e $file ]; then
+		touch $file;
+	else
+		echo "File Exist!";
+		exit 0;
+	fi
+else
+	file=$1.$2;
+	if [ ! -e $file ]; then
+		touch $file;
+	else
+		echo "File Exist!";
+		exit 0;
+	fi
+fi
+
+# Check for permissions
+if [[ "$3" -ne "-n" || "$3" -ne " " ]]; then
+	perm=$3;
+	chmod $perm $file;
+else
+	chmod 755 $file;
+fi
+
+if [[ $3 == "-n" || $4 == "-n" ]]; then
+	exit 0;
+else
+	case $2 in
+		sh) echo "#!/system/bin/sh" > $file;;
+		bash) echo "#!/system/bin/bash" > $file;;
+		c) echo "#include <stdio.h>" > $file;;
+		cpp) echo "#include <iostream>" > $file;;
+		py) exit 0;;
+		rs) exit 0;;
+		txt) exit 0;;
+	esac
+fi

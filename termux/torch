@@ -3,14 +3,14 @@
 bname=$(basename $0)
 boldblue="\033[01;34m"
 boldgreen="\033[01;32m"
+cyan="\033[00;36m"
 none="\033[0m"
-# Help message
-function helpMessage() {
+# Usage message
+function usage() {
 echo -e "$boldblue
-Torch v1.0 (2024-11-29 11:01:00 EST) by @KnightEndall $none
-
-$boldgreen
-Purpose: $none
+Torch v1.1 Termux Edition (2024-11-30 19:50:19 EST)\n
+By$cyan https://t.me/KnightEndall $none
+$boldgreen\nPurpose: $none
 	Creates a new file with 755 permissions and optional header.
 $boldgreen
 Usage: $none
@@ -25,7 +25,7 @@ Options: $none
 $boldgreen
 Arguments: $none
 	filename: The desired name for the new file.
-	extension: File extension (e.g., sh, bash, c, c++, py, rs, txt).
+	extension: File extension (e.g., sh, bash, zsh, c, c++, py, rs, txt).
 	permissions: The desired permissions if other than 755.
 	-n: Optional flag to create the file without adding a header.
 $boldgreen
@@ -35,6 +35,9 @@ Examples: $none
 	
 	Create a new bash script:
 		$bname myscript bash
+	
+	Create a new Z Shell script:
+		$bname myscript zsh
 
 	Create a new C file:
 		$bname myprogram c
@@ -60,13 +63,26 @@ Additional Notes: $none
 }
 
 # Check for help flag
-if [[ "$1" == "-h" || "$1" == "--help" ]]; then
-	helpMessage
+if [[ "$1" == "-h" || "$1" == "--help" || "$1" == "" ]]; then
+	usage
 	exit 0;
 fi
 
-# Check to see if file exist
-if [[ $2 == "bash" ]]; then
+# Check to see if extension is not wanted
+if [[ $2 == "" ]]; then
+	file=$1;
+	if [ ! -e $file ]; then
+		touch $file;
+		chmod 755 $file;
+		exit 0;
+	else
+		echo "File Exist!";
+		exit 0;
+	fi
+fi
+
+# Check to see if bash or zsh or if file exist
+if [[ $2 == "bash" || $2 == "zsh" ]]; then
 	file=$1.sh;
 	if [ ! -e $file ]; then
 		touch $file;
@@ -96,11 +112,12 @@ if [[ $3 == "-n" || $4 == "-n" ]]; then
 	exit 0;
 else
 	case $2 in
-		sh) echo "#!/system/bin/sh" > $file;;
-		bash) echo "#!/system/bin/bash" > $file;;
+		sh) echo "#!/usr/bin/env sh" > $file;;
+		bash) echo "#!/usr/bin/env bash" > $file;;
+		zsh) echo "#!/usr/bin/env zsh" > $file;;
 		c) echo "#include <stdio.h>" > $file;;
 		cpp) echo "#include <iostream>" > $file;;
-		py) exit 0;;
+		py) echo "#!/usr/bin/env python3" > $file;;
 		rs) exit 0;;
 		txt) exit 0;;
 	esac
